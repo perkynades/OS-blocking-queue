@@ -6,13 +6,13 @@ public interface Channel
      * Send an object through the channel
      * @param item 
      */
-    public void send(Object item);
+    public void send(Object item) throws InterruptedException;
     
     /**
      * Receive an item from the channel
      * @return 
      */
-    public Object receive();
+    public Object receive() throws InterruptedException;
     
     /** 
      * Return number of sent items not yet received on the other side 
