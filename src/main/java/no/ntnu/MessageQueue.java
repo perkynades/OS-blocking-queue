@@ -18,21 +18,28 @@ public class MessageQueue implements Channel {
     }
 
     @Override
-    public void send(Object item) {
-        // TODO - block if the queue is full
-        queue.add(item);
+    public synchronized void send(Object item) throws InterruptedException {
+        while (this.queue.size() == this.size) {
+            wait();
+        }
+        this.queue.add(item);
+        if (this.queue.size() == 1) {
+            notifyAll();
+        }
+        //IF the amount of object's is bigger than the size, block
     }
 
     // implements a nonblocking receive
     @Override
-    public Object receive() {
-        // TODO - block if the queue is empty, and always return the first 
-        // element in the queue
-        if (queue.isEmpty()) {
-            return null;
-        } else {
-            return queue.remove(0);
+    public synchronized Object receive() throws InterruptedException{
+        while (queue.isEmpty()) {
+            wait();
         }
+        if (this.queue.size() == this.size) {
+            notifyAll();
+        }
+
+        return this.queue.remove(0);
     }
 
     @Override
