@@ -19,22 +19,28 @@ public class MessageQueue implements Channel {
 
     @Override
     public synchronized void send(Object item) throws InterruptedException {
+        // While the size of the queue is the same as the limit
+        // Wait for queue space
         while (this.queue.size() == this.size) {
             wait();
         }
+
         this.queue.add(item);
+        // if an item is in the queue, notify all the channels
         if (this.queue.size() == 1) {
             notifyAll();
         }
-        //IF the amount of object's is bigger than the size, block
+
     }
 
-    // implements a nonblocking receive
     @Override
-    public synchronized Object receive() throws InterruptedException{
+    public synchronized Object receive() throws InterruptedException {
+        // If the queue is empty, wait for an item
         while (queue.isEmpty()) {
             wait();
         }
+
+        // If the queue is full, notify all the channels
         if (this.queue.size() == this.size) {
             notifyAll();
         }
